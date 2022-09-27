@@ -1,7 +1,7 @@
 
 #include "test_operation/test_operation.hpp"
 
-/*
+
 
 void TestOperation::SubscribeCurrentPosition(const sts_servo_msgs::msg::CurrentPosition::SharedPtr msg){
 
@@ -10,7 +10,7 @@ void TestOperation::SubscribeCurrentPosition(const sts_servo_msgs::msg::CurrentP
 
 	for(int servo_id = 0 ; servo_id < servo_id_size ; servo_id++){
 
-		RCLCPP_INFO(this->get_logger(),"current_velocity[%d] = %d\n", servo_id, msg->current_position[servo_id]); 
+		RCLCPP_INFO(this->get_logger(),"current_position[%d] = %d\n", servo_id, msg->current_position[servo_id]); 
 	}
 
 
@@ -42,7 +42,7 @@ void TestOperation::SubscribeCurrentLoad(const sts_servo_msgs::msg::CurrentLoad:
 	}
 
 }
-*/
+
 
 
 void TestOperation::PublishPositionCommand(){
@@ -54,11 +54,12 @@ void TestOperation::PublishPositionCommand(){
 
 	sts_servo_msgs::msg::PositionCommand array;
 
-
 	array.servo_id.resize(NUMBER_OF_SERVO);
 	array.acceleration.resize(NUMBER_OF_SERVO);
 	array.position.resize(NUMBER_OF_SERVO);
 	array.velocity.resize(NUMBER_OF_SERVO);
+
+	RCLCPP_INFO(this->get_logger(),"PublishPositionCommand"); 
 
 	for(int servo_id = 0 ; servo_id < NUMBER_OF_SERVO ; servo_id++){
 		
@@ -66,11 +67,7 @@ void TestOperation::PublishPositionCommand(){
 		array.acceleration[servo_id] = acceleration[servo_id];
 		array.position[servo_id] = input_position[loop_count_];
 		array.velocity[servo_id] = velocity[servo_id];
-
-		RCLCPP_INFO(this->get_logger(),"array.velocity[%d] = %d\n", servo_id, velocity[servo_id]); 
 	}	
-
-
 	
 	if(loop_count_ == 0){
 
@@ -82,7 +79,6 @@ void TestOperation::PublishPositionCommand(){
 	}
 
 	position_command_pub_->publish(array);
-
 
 }
 

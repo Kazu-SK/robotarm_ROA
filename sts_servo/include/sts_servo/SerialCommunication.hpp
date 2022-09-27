@@ -17,6 +17,7 @@
 #define DEVICE_FILE "/dev/ttyUSB0"
 #define BAUDRATE B1000000
 
+#include <iostream>
 
 class SerialCommunication{
 

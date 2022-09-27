@@ -28,9 +28,8 @@ const unsigned char STSServo::CURRENT_LOAD_REGISTER_ = 0x3C;
 const int STSServo::REPLY_DATA_SIZE_ = 8;
 
 
-void STSServo::OperateSTSServo(const sts_servo_msgs::msg::PositionCommand::SharedPtr msg){
 
-	RCLCPP_INFO(this->get_logger(),"*** STSServo OperateSTSServo ***");	
+void STSServo::OperateSTSServo(const sts_servo_msgs::msg::PositionCommand::SharedPtr msg){
 
 	PositionCommandFormat format;
 
@@ -69,31 +68,13 @@ void STSServo::OperateSTSServo(const sts_servo_msgs::msg::PositionCommand::Share
 
 		format.check_sum = ~((unsigned char)(sum & 0xFF));
 
-		/*
-		RCLCPP_INFO(this->get_logger(),"header_LOW_BYTE\t:\t%x",format.header_LOW_BYTE);	
-		RCLCPP_INFO(this->get_logger(),"header_HIGH_BYTE\t:\t%x",format.header_HIGH_BYTE);	
-		RCLCPP_INFO(this->get_logger(),"id\t:\t%x",format.id);	
-		RCLCPP_INFO(this->get_logger(),"packet_data_size\t:\t%x",format.packet_data_size);	
-		RCLCPP_INFO(this->get_logger(),"command\t:\t%x",format.command);	
-		RCLCPP_INFO(this->get_logger(),"regisuter_top\t:\t%x",format.register_top);	
-		RCLCPP_INFO(this->get_logger(),"acceleration\t:\t%x",format.acceleration);	
-		RCLCPP_INFO(this->get_logger(),"position_LOW_BYTE\t:\t%x",format.position_LOW_BYTE);	
-		RCLCPP_INFO(this->get_logger(),"position_HIGH_BYTE\t:\t%x",format.position_HIGH_BYTE);	
-		RCLCPP_INFO(this->get_logger(),"time_LOW_BYTE\t:\t%x",format.time_LOW_BYTE);	
-		RCLCPP_INFO(this->get_logger(),"time_HIGH_BYTE\t:\t%x",format.time_HIGH_BYTE);	
-		RCLCPP_INFO(this->get_logger(),"velocity_LOW_BYTE\t:\t%x",format.velocity_LOW_BYTE);	
-		RCLCPP_INFO(this->get_logger(),"velocity_HIGH_BYTE\t:\t%x",format.velocity_HIGH_BYTE);	
-		RCLCPP_INFO(this->get_logger(),"check_sum\t:\t%x",format.check_sum);	
-		*/
+		rclcpp::sleep_for(5ms);
 
 		serial_communication_->SerialWrite((unsigned char *)&format, sizeof(format));
-
-
 	}
 
 }
 
-/*
 
 void STSServo::PublishCurrentPosition(){
 
@@ -105,13 +86,14 @@ void STSServo::PublishCurrentPosition(){
 
 	array.current_position.resize(NUMBER_OF_SERVO);
 
+	RCLCPP_INFO(this->get_logger(),"PublishCurrentPosition");
 
 	for(unsigned char id = ID_0 ; id < NUMBER_OF_SERVO ; id++){
 
 		sum = 0;
 
 		format.header_LOW_BYTE = HEADER_LOW_BYTE_;	
-		format.header_LOW_BYTE = HEADER_HIGH_BYTE_;	
+		format.header_HIGH_BYTE = HEADER_HIGH_BYTE_;	
 		sum += format.id = id;
 		sum += format.packet_data_size = READ_COMMAND_DATA_SIZE_;
 		sum += format.command = READ_COMMAND_;
@@ -119,21 +101,23 @@ void STSServo::PublishCurrentPosition(){
 		sum += format.request_data_size = sizeof(array.current_position[id]);
 		format.check_sum = ~((unsigned char)(sum & 0xFF));
 
+		rclcpp::sleep_for(5ms);
 		serial_communication_->SerialWrite((unsigned char *)&format, sizeof(format));
 
 		//要求データは6,7バイト目に格納される。
 		//FEETECH社デジタルサーボ使用方法 参照
 		//https://akizukidenshi.com/download/ds/akizuki/feetech_digital_servo_20220729.pdf
+
+		rclcpp::sleep_for(5ms);
 		serial_communication_->SerialRead(reply_data, sizeof(reply_data));
 
-		array.current_position[id] = (unsigned short)((reply_data[6] << 8) & reply_data[5]);
+		array.current_position[id] = (unsigned short)((reply_data[6] << 8) | reply_data[5]);
 
 	}	
 
 	current_position_pub_->publish(array);
-
-	RCLCPP_INFO(this->get_logger(),"PublishCurrentPosition");	
 }
+
 
 void STSServo::PublishCurrentVelocity(){
 
@@ -146,12 +130,14 @@ void STSServo::PublishCurrentVelocity(){
 
 	array.current_velocity.resize(NUMBER_OF_SERVO);
 
+	RCLCPP_INFO(this->get_logger(),"PublishCurrentVelocity");
+
 	for(unsigned char id = ID_0 ; id < NUMBER_OF_SERVO ; id++){
 
 		sum = 0;
 
 		format.header_LOW_BYTE = HEADER_LOW_BYTE_;	
-		format.header_LOW_BYTE = HEADER_HIGH_BYTE_;	
+		format.header_HIGH_BYTE = HEADER_HIGH_BYTE_;	
 		sum += format.id = id;
 		sum += format.packet_data_size = READ_COMMAND_DATA_SIZE_;
 		sum += format.command = READ_COMMAND_;
@@ -159,16 +145,17 @@ void STSServo::PublishCurrentVelocity(){
 		sum += format.request_data_size = sizeof(array.current_velocity[id]);
 		format.check_sum = ~((unsigned char)(sum & 0xFF));
 
+		rclcpp::sleep_for(5ms);
 		serial_communication_->SerialWrite((unsigned char *)&format, sizeof(format));
 
+		rclcpp::sleep_for(5ms);
 		serial_communication_->SerialRead(reply_data, sizeof(reply_data));
 
-		array.current_velocity[id] = (unsigned short)((reply_data[6] << 8) & reply_data[5]);
+		array.current_velocity[id] = (unsigned short)((reply_data[6] << 8) | reply_data[5]);
 
 	}	
 
-	current_velocity_pub_->publish(array);
-
+	//current_velocity_pub_->publish(array);
 }
 
 
@@ -183,10 +170,14 @@ void STSServo::PublishCurrentLoad(){
 
 	array.current_load.resize(NUMBER_OF_SERVO);
 
-	for(unsigned char id = ID_0 ; id <= NUMBER_OF_SERVO ; id++){
+	RCLCPP_INFO(this->get_logger(), "PublishCurrentLoad");
+
+	for(unsigned char id = ID_0 ; id < NUMBER_OF_SERVO ; id++){
+
+		sum = 0;
 
 		format.header_LOW_BYTE = HEADER_LOW_BYTE_;	
-		format.header_LOW_BYTE = HEADER_HIGH_BYTE_;	
+		format.header_HIGH_BYTE = HEADER_HIGH_BYTE_;	
 		sum += format.id = id;
 		sum += format.packet_data_size = READ_COMMAND_DATA_SIZE_;
 		sum += format.command = READ_COMMAND_;
@@ -194,15 +185,16 @@ void STSServo::PublishCurrentLoad(){
 		sum += format.request_data_size = sizeof(array.current_load[id]);
 		format.check_sum = ~((unsigned char)(sum & 0xFF));
 
+		rclcpp::sleep_for(5ms);
 		serial_communication_->SerialWrite((unsigned char *)&format, sizeof(format));
 
+		rclcpp::sleep_for(5ms);
 		serial_communication_->SerialRead(reply_data, sizeof(reply_data));
 
-		array.current_load[id] = (unsigned short)((reply_data[6] << 8) & reply_data[5]);
+		array.current_load[id] = (unsigned short)((reply_data[6] << 8) | reply_data[5]);
 
 	}	
 
-	current_load_pub_->publish(array);
 
+	//current_load_pub_->publish(array);
 }
-*/

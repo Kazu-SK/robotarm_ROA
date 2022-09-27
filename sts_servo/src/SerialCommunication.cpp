@@ -45,7 +45,20 @@ int SerialCommunication::SerialWrite(unsigned char write_data[], int write_data_
 
     int w_rtn;
 
+
     w_rtn = write(fd,write_data,write_data_size);
+
+
+    if(tcdrain(fd) < 0){
+
+	std::cout<<"tcdrain(fd) error"<<std::endl;
+    }
+
+    if(tcflush(fd, TCOFLUSH) < 0){
+
+	std::cout<<"tcflush(fd, TCOFLUSH) error"<<std::endl;
+    }
+
 
     return w_rtn;
 }
@@ -60,10 +73,15 @@ int SerialCommunication::SerialRead(unsigned char reply_data[], int request_data
     while(read_data_size < request_data_size){
 
         r_rtn = read(fd, reply_data + read_data_size, request_data_size - read_data_size);
-        
+
         if(r_rtn < 0)return r_rtn;
 
         read_data_size += r_rtn;
+    }
+
+    if(tcflush(fd, TCIFLUSH) < 0){
+
+	std::cout<<"tcflush(fd, TCIFLUSH) error"<<std::endl;
     }
 
 
