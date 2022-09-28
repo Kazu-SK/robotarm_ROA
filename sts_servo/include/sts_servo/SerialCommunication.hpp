@@ -31,6 +31,8 @@ public:
     int SerialRead(unsigned char reply_data[], int request_data_size);
     int SerialWrite(unsigned char write_data[],int write_data_size);
 
+    int TciFlush(){return tcflush(fd,TCIFLUSH); }
+
     SerialCommunication(){
 
         if(OpenDevice() < 0){

@@ -71,6 +71,7 @@ void STSServo::OperateSTSServo(const sts_servo_msgs::msg::PositionCommand::Share
 		rclcpp::sleep_for(5ms);
 
 		serial_communication_->SerialWrite((unsigned char *)&format, sizeof(format));
+
 	}
 
 }
@@ -100,6 +101,13 @@ void STSServo::PublishCurrentPosition(){
 		sum += format.register_top = CURRENT_POSITION_REGISTER_;
 		sum += format.request_data_size = sizeof(array.current_position[id]);
 		format.check_sum = ~((unsigned char)(sum & 0xFF));
+		
+
+		if(serial_communication_->TciFlush() < 0){
+
+			std::cout<<"tcflush(fd, TCIFLUSH) error"<<std::endl;
+		}
+		
 
 		rclcpp::sleep_for(5ms);
 		serial_communication_->SerialWrite((unsigned char *)&format, sizeof(format));
@@ -145,6 +153,11 @@ void STSServo::PublishCurrentVelocity(){
 		sum += format.request_data_size = sizeof(array.current_velocity[id]);
 		format.check_sum = ~((unsigned char)(sum & 0xFF));
 
+		if(serial_communication_->TciFlush() < 0){
+
+			std::cout<<"tcflush(fd, TCIFLUSH) error"<<std::endl;
+		}
+
 		rclcpp::sleep_for(5ms);
 		serial_communication_->SerialWrite((unsigned char *)&format, sizeof(format));
 
@@ -184,6 +197,11 @@ void STSServo::PublishCurrentLoad(){
 		sum += format.register_top = CURRENT_LOAD_REGISTER_;
 		sum += format.request_data_size = sizeof(array.current_load[id]);
 		format.check_sum = ~((unsigned char)(sum & 0xFF));
+
+		if(serial_communication_->TciFlush() < 0){
+
+			std::cout<<"tcflush(fd, TCIFLUSH) error"<<std::endl;
+		}
 
 		rclcpp::sleep_for(5ms);
 		serial_communication_->SerialWrite((unsigned char *)&format, sizeof(format));
