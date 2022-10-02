@@ -8,9 +8,12 @@ void TestOperation::SubscribeCurrentPosition(const sts_servo_msgs::msg::CurrentP
 	int servo_id_size = msg->current_position.size();
 
 
+	fprintf(current_position_file,"********* operation_count_ = %d **********\n",operation_count_);
 	for(int servo_id = 0 ; servo_id < servo_id_size ; servo_id++){
 
-		RCLCPP_INFO(this->get_logger(),"current_position[%d] = %d\n", servo_id, msg->current_position[servo_id]); 
+		//RCLCPP_INFO(this->get_logger(),"current_position[%d] = %d\n", servo_id, msg->current_position[servo_id]); 
+		fprintf(current_position_file,"current_position[%d] = %d\n",servo_id,msg->current_position[servo_id]);
+
 	}
 
 
@@ -22,11 +25,12 @@ void TestOperation::SubscribeCurrentVelocity(const sts_servo_msgs::msg::CurrentV
 	int servo_id_size = msg->current_velocity.size();
 
 
+	fprintf(current_velocity_file,"********* operation_count_ = %d **********\n",operation_count_);
 	for(int servo_id = 0 ; servo_id < servo_id_size ; servo_id++){
 
-		RCLCPP_INFO(this->get_logger(),"current_velocity[%d] = %d\n", servo_id, msg->current_velocity[servo_id]); 
+		//RCLCPP_INFO(this->get_logger(),"current_velocity[%d] = %d\n", servo_id, msg->current_velocity[servo_id]); 
+		fprintf(current_velocity_file,"current_velocity[%d] = %d\n",servo_id,msg->current_velocity[servo_id]);
 	}
-
 
 }
 
@@ -36,9 +40,11 @@ void TestOperation::SubscribeCurrentLoad(const sts_servo_msgs::msg::CurrentLoad:
 	int servo_id_size = msg->current_load.size();
 
 
+	fprintf(current_load_file,"********* operation_count_ = %d **********\n",operation_count_);
 	for(int servo_id = 0 ; servo_id < servo_id_size ; servo_id++){
 
-		RCLCPP_INFO(this->get_logger(),"current_load[%d] = %d\n", servo_id, msg->current_load[servo_id]); 
+		//RCLCPP_INFO(this->get_logger(),"current_load[%d] = %d\n", servo_id, msg->current_load[servo_id]); 
+		fprintf(current_load_file,"current_load[%d] = %d\n",servo_id,msg->current_load[servo_id]);
 	}
 
 }
@@ -77,6 +83,8 @@ void TestOperation::PublishPositionCommand(){
 
 		loop_count_ = 0;
 	}
+
+	operation_count_++;
 
 	position_command_pub_->publish(array);
 

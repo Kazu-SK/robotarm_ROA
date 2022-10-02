@@ -102,14 +102,13 @@ void STSServo::PublishCurrentPosition(){
 		sum += format.request_data_size = sizeof(array.current_position[id]);
 		format.check_sum = ~((unsigned char)(sum & 0xFF));
 		
+		rclcpp::sleep_for(5ms);
 
 		if(serial_communication_->TciFlush() < 0){
 
 			std::cout<<"tcflush(fd, TCIFLUSH) error"<<std::endl;
 		}
-		
 
-		rclcpp::sleep_for(5ms);
 		serial_communication_->SerialWrite((unsigned char *)&format, sizeof(format));
 
 		//要求データは6,7バイト目に格納される。
@@ -153,12 +152,13 @@ void STSServo::PublishCurrentVelocity(){
 		sum += format.request_data_size = sizeof(array.current_velocity[id]);
 		format.check_sum = ~((unsigned char)(sum & 0xFF));
 
+		rclcpp::sleep_for(5ms);
+
 		if(serial_communication_->TciFlush() < 0){
 
 			std::cout<<"tcflush(fd, TCIFLUSH) error"<<std::endl;
 		}
 
-		rclcpp::sleep_for(5ms);
 		serial_communication_->SerialWrite((unsigned char *)&format, sizeof(format));
 
 		rclcpp::sleep_for(5ms);
@@ -168,7 +168,7 @@ void STSServo::PublishCurrentVelocity(){
 
 	}	
 
-	//current_velocity_pub_->publish(array);
+	current_velocity_pub_->publish(array);
 }
 
 
@@ -198,12 +198,13 @@ void STSServo::PublishCurrentLoad(){
 		sum += format.request_data_size = sizeof(array.current_load[id]);
 		format.check_sum = ~((unsigned char)(sum & 0xFF));
 
+		rclcpp::sleep_for(5ms);
+
 		if(serial_communication_->TciFlush() < 0){
 
 			std::cout<<"tcflush(fd, TCIFLUSH) error"<<std::endl;
 		}
 
-		rclcpp::sleep_for(5ms);
 		serial_communication_->SerialWrite((unsigned char *)&format, sizeof(format));
 
 		rclcpp::sleep_for(5ms);
@@ -213,6 +214,5 @@ void STSServo::PublishCurrentLoad(){
 
 	}	
 
-
-	//current_load_pub_->publish(array);
+	current_load_pub_->publish(array);
 }

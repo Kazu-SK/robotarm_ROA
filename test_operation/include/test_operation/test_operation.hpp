@@ -50,6 +50,11 @@ private:
 	rclcpp::TimerBase::SharedPtr position_command_timer_;
 
 	int loop_count_;
+	int operation_count_;
+
+	FILE *current_position_file;
+	FILE *current_velocity_file;
+	FILE *current_load_file;
 
 public:
 	TestOperation() : Node("TestOperation"){
@@ -60,10 +65,32 @@ public:
 		current_load_sub_ = this->create_subscription<sts_servo_msgs::msg::CurrentLoad>("current_load_topic", 10, std::bind(&TestOperation::SubscribeCurrentLoad, this, _1));
 
 		
-		position_command_timer_ = this->create_wall_timer(3000ms, std::bind(&TestOperation::PublishPositionCommand, this));
+		position_command_timer_ = this->create_wall_timer(1500ms, std::bind(&TestOperation::PublishPositionCommand, this));
 		position_command_pub_ = this->create_publisher<sts_servo_msgs::msg::PositionCommand>("position_command_topic", 10);
 
+		current_position_file = fopen("current_position_data_log.txt","w");
+		if(current_position_file == NULL){
+			std::cout<<"cannot open current_position_file "<<std::endl;
+		}
+		current_velocity_file = fopen("current_velocity_data_log.txt","w");
+		if(current_velocity_file == NULL){
+			std::cout<<"cannot open current_velocity_file "<<std::endl;
+		}
+		current_load_file = fopen("current_load_data_log.txt","w");
+		if(current_load_file == NULL){
+			std::cout<<"cannot open current_load_file "<<std::endl;
+		}
+
 		loop_count_ = 0;
+		operation_count_ = 0;
+	}
+
+
+	~TestOperation(){
+
+		fclose(current_position_file);
+		fclose(current_velocity_file);
+		fclose(current_load_file);
 	}
 
 
