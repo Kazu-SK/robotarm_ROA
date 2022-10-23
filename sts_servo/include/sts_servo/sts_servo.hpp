@@ -81,6 +81,12 @@ public:
 	}
 
 
+	~STSServo(){
+
+		delete serial_communication_;
+	}
+
+
 	void OperateSTSServo(const sts_servo_msgs::msg::PositionCommand::SharedPtr msg); 
 
 	void PublishCurrentPosition();

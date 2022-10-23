@@ -102,7 +102,7 @@ int SerialCommunication::CloseDevice(){
         return rtn;
     }
 
-    printf("file closed\n");
+    std::cout<<"device file closed"<<std::endl;
 
     return rtn;
 }
